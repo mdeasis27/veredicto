@@ -1,0 +1,100 @@
+[
+  {
+    "id": "j01",
+    "questionId": "q01",
+    "answer": "La tasa de interés de mora es 12 por ciento efectivo anual.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j02",
+    "questionId": "q02",
+    "answer": "El plazo máximo de un crédito de consumo es de 60 meses.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j03",
+    "questionId": "q04",
+    "answer": "Debe presentar identificación oficial y comprobante de ingresos.",
+    "human1": [3, 2],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j04",
+    "questionId": "q05",
+    "answer": "El score mínimo para aprobación automática es 680 puntos.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j05",
+    "questionId": "q06",
+    "answer": "Si aparece en listas PEP la solicitud se rechaza automáticamente.",
+    "human1": [3, 2],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j06",
+    "questionId": "q09",
+    "answer": "Se aceptan cédula, pasaporte y licencia de conducir.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j07",
+    "questionId": "q13",
+    "answer": "Necesita identificación, comprobante de ingresos, no estar reportado y un score de al menos 680.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j08",
+    "questionId": "q08",
+    "answer": "El umbral de similitud facial es de 0.90.",
+    "human1": [3, 2],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j09",
+    "questionId": "q11",
+    "answer": "El monto máximo de un crédito de consumo es de cincuenta millones de pesos.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j10",
+    "questionId": "q16",
+    "answer": "Direcciones IP inconsistentes y documentos manipulados son señales de fraude.",
+    "human1": [3, 2],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j11",
+    "questionId": "q19",
+    "answer": "Tasa de 12 por ciento, plazo máximo de 60 meses y monto máximo de cincuenta millones.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j12",
+    "questionId": "q10",
+    "answer": "De 1 a 7 días tono suave, de 8 a 30 días tono firme y más de 30 días tono urgente.",
+    "human1": [3, 3],
+    "human2": [3, 3]
+  },
+  {
+    "id": "j13",
+    "questionId": "q01",
+    "answer": "La tasa de interés de mora es del 5 por ciento.",
+    "human1": [1, 2],
+    "human2": [1, 2]
+  },
+  {
+    "id": "j14",
+    "questionId": "q05",
+    "answer": "No tengo esa información.",
+    "human1": [1, 1],
+    "human2": [1, 1]
+  }
+]

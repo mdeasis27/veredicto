@@ -1,0 +1,98 @@
+[
+  {
+    "id": "c01",
+    "docId": "politica-credito",
+    "section": "Tasas",
+    "text": "La tasa de interés de mora para créditos de consumo es del 12 por ciento efectivo anual. Esta tasa se aplica únicamente sobre el saldo vencido."
+  },
+  {
+    "id": "c02",
+    "docId": "politica-credito",
+    "section": "Plazos",
+    "text": "El plazo máximo de un crédito de consumo es de 60 meses. El plazo mínimo es de 6 meses para montos superiores a un salario mínimo."
+  },
+  {
+    "id": "c03",
+    "docId": "politica-credito",
+    "section": "Plazos",
+    "text": "Para crédito hipotecario el plazo máximo es de 20 años y se requiere un enganche mínimo del 20 por ciento del valor del inmueble."
+  },
+  {
+    "id": "c04",
+    "docId": "politica-credito",
+    "section": "Requisitos",
+    "text": "Para solicitar un crédito de consumo el cliente debe presentar identificación oficial vigente, comprobante de ingresos de los últimos tres meses y no estar reportado en centrales de riesgo."
+  },
+  {
+    "id": "c05",
+    "docId": "politica-credito",
+    "section": "Requisitos",
+    "text": "El score de crédito mínimo para aprobación automática es 680 puntos. Entre 600 y 679 puntos el caso pasa a revisión manual por un analista."
+  },
+  {
+    "id": "c06",
+    "docId": "politica-credito",
+    "section": "Riesgo",
+    "text": "Un reporte de sanciones internacionales o la aparición en listas PEP es causa de rechazo automático, sin importar el score de crédito."
+  },
+  {
+    "id": "c07",
+    "docId": "identidad",
+    "section": "Verificación",
+    "text": "La verificación de identidad combina biometría facial con la consulta de listas de sanciones y validación documental del documento de identidad."
+  },
+  {
+    "id": "c08",
+    "docId": "identidad",
+    "section": "Verificación",
+    "text": "El umbral de similitud facial para confirmar identidad es de 0.90. Por debajo de 0.60 la verificación falla y se solicita un nuevo intento."
+  },
+  {
+    "id": "c09",
+    "docId": "identidad",
+    "section": "Documentos",
+    "text": "Los documentos aceptados son cédula, pasaporte y licencia de conducir. No se aceptan documentos vencidos ni fotografías de pantalla."
+  },
+  {
+    "id": "c10",
+    "docId": "cobranza",
+    "section": "Estrategia",
+    "text": "La estrategia de cobranza se segmenta por días de mora: de 1 a 7 días tono suave, de 8 a 30 días tono firme, y más de 30 días tono urgente con escalamiento."
+  },
+  {
+    "id": "c11",
+    "docId": "cobranza",
+    "section": "Estrategia",
+    "text": "Los mensajes de cobranza se envían por canal digital con prioridad alta para clientes del segmento empresarial y montos superiores a diez millones."
+  },
+  {
+    "id": "c12",
+    "docId": "fraude",
+    "section": "Señales",
+    "text": "Señales de fraude incluyen: direcciones IP inconsistentes, documentos manipulados, y múltiples solicitudes desde el mismo dispositivo en menos de una hora."
+  },
+  {
+    "id": "c13",
+    "docId": "fraude",
+    "section": "Señales",
+    "text": "El sistema marca como revisión manual cuando el score facial está entre 0.60 y 0.90 o cuando hay discrepancias entre el nombre del documento y el autorreportado."
+  },
+  {
+    "id": "c14",
+    "docId": "limites",
+    "section": "Montos",
+    "text": "El monto máximo de un crédito de consumo es de cincuenta millones de pesos. Montos superiores requieren aprobación del comité de crédito."
+  },
+  {
+    "id": "c15",
+    "docId": "limites",
+    "section": "Montos",
+    "text": "La exposición total por cliente no puede superar el 15 por ciento del patrimonio técnico de la entidad, incluyendo crédito, leasing y avales."
+  },
+  {
+    "id": "c16",
+    "docId": "limites",
+    "section": "Montos",
+    "text": "El cupo de una tarjeta de crédito se calcula como 2.5 veces el ingreso mensual comprobado, con un tope de treinta millones de pesos."
+  }
+]

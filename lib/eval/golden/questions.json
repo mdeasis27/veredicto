@@ -1,0 +1,170 @@
+[
+  {
+    "id": "q01",
+    "query": "¿Cuál es la tasa de interés de mora para créditos de consumo?",
+    "relevantChunkIds": ["c01"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q02",
+    "query": "¿Cuál es el plazo máximo de un crédito de consumo?",
+    "relevantChunkIds": ["c02"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q03",
+    "query": "¿Qué enganche se requiere para un crédito hipotecario?",
+    "relevantChunkIds": ["c03"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q04",
+    "query": "¿Qué documentos debo presentar para pedir un crédito de consumo?",
+    "relevantChunkIds": ["c04"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q05",
+    "query": "¿Cuál es el score mínimo para aprobación automática?",
+    "relevantChunkIds": ["c05"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q06",
+    "query": "¿Qué pasa si una persona aparece en listas PEP?",
+    "relevantChunkIds": ["c06"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q07",
+    "query": "¿Qué métodos usa la verificación de identidad?",
+    "relevantChunkIds": ["c07"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q08",
+    "query": "¿Cuál es el umbral de similitud facial para confirmar identidad?",
+    "relevantChunkIds": ["c08"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q09",
+    "query": "¿Qué documentos de identidad se aceptan?",
+    "relevantChunkIds": ["c09"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q10",
+    "query": "¿Cómo se segmenta la estrategia de cobranza por días de mora?",
+    "relevantChunkIds": ["c10"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q11",
+    "query": "¿Cuál es el monto máximo de un crédito de consumo?",
+    "relevantChunkIds": ["c14"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q12",
+    "query": "¿Cómo se calcula el cupo de una tarjeta de crédito?",
+    "relevantChunkIds": ["c16"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q13",
+    "query": "¿Qué requisitos y qué score se necesitan para que un crédito de consumo sea aprobado sin revisión?",
+    "relevantChunkIds": ["c04", "c05"],
+    "difficulty": "multi",
+    "answerable": true
+  },
+  {
+    "id": "q14",
+    "query": "¿En qué casos una verificación de identidad termina en revisión manual?",
+    "relevantChunkIds": ["c13"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q15",
+    "query": "¿Cuál es el monto máximo de consumo y cuándo se requiere el comité de crédito?",
+    "relevantChunkIds": ["c14"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q16",
+    "query": "¿Qué señales indican fraude en una solicitud?",
+    "relevantChunkIds": ["c12"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q17",
+    "query": "¿Cuál es la exposición máxima por cliente frente al patrimonio técnico?",
+    "relevantChunkIds": ["c15"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q18",
+    "query": "Compara el plazo máximo de un crédito de consumo y el de un crédito hipotecario.",
+    "relevantChunkIds": ["c02", "c03"],
+    "difficulty": "multi",
+    "answerable": true
+  },
+  {
+    "id": "q19",
+    "query": "¿Qué tasa, qué plazo máximo y qué monto máximo aplican a un crédito de consumo?",
+    "relevantChunkIds": ["c01", "c02", "c14"],
+    "difficulty": "aggregation",
+    "answerable": true
+  },
+  {
+    "id": "q20",
+    "query": "¿Cuántos clientes aprobados hubo el mes pasado?",
+    "relevantChunkIds": [],
+    "difficulty": "out-of-scope",
+    "answerable": false
+  },
+  {
+    "id": "q21",
+    "query": "¿Quién es el director de marketing de la entidad?",
+    "relevantChunkIds": [],
+    "difficulty": "out-of-scope",
+    "answerable": false
+  },
+  {
+    "id": "q22",
+    "query": "¿Cómo se prepara un risotto de setas?",
+    "relevantChunkIds": [],
+    "difficulty": "out-of-scope",
+    "answerable": false
+  },
+  {
+    "id": "q23",
+    "query": "¿Cuál es el plazo mínimo de un crédito de consumo para montos altos?",
+    "relevantChunkIds": ["c02"],
+    "difficulty": "single",
+    "answerable": true
+  },
+  {
+    "id": "q24",
+    "query": "¿Qué estrategia de cobranza se usa con un cliente empresarial que debe más de diez millones?",
+    "relevantChunkIds": ["c10", "c11"],
+    "difficulty": "multi",
+    "answerable": true
+  }
+]
