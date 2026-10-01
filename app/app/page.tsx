@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Alert } from "@/design-system/components/alert";
 import { Card } from "@/design-system/components/card";
 import { MetricCard } from "@/design-system/components/metric-card";
 import { StatusBadge } from "@/design-system/components/status-badge";
 import { getBenchmark, getCalibration } from "@/lib/eval/demo";
-import { demoJudgeScore, judgeTotal, type JudgeScores } from "@/lib/eval/demo-judge";
 
 const BENCH = getBenchmark();
 const CAL = getCalibration();
@@ -20,14 +19,71 @@ const SOURCE_PRE =
 const ANSWER_PRE =
   "El crédito se aprueba cuando el puntaje supera 650 y el ingreso mensual duplica la cuota.";
 
+interface ScoreResult {
+  correccion: number;
+  completitud: number;
+  confidence: number;
+  total: number;
+  persisted?: boolean;
+  error?: string;
+}
+
+interface HistoryItem {
+  id: number;
+  correccion: number;
+  completitud: number;
+  confidence: number;
+  total: number;
+  created_at: string;
+}
+
 export default function AppPage() {
   const [source, setSource] = useState(SOURCE_PRE);
   const [answer, setAnswer] = useState(ANSWER_PRE);
-  const [result, setResult] = useState<JudgeScores | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ScoreResult | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  function run() {
-    setResult(demoJudgeScore(answer, source));
+  async function run() {
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer, source }),
+      });
+      const data = await res.json();
+      setResult(data);
+      if (res.ok) loadHistory();
+    } catch (err) {
+      setResult({
+        correccion: 0,
+        completitud: 0,
+        confidence: 0,
+        total: 0,
+        error: err instanceof Error ? err.message : "Error de red",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch("/api/history");
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data.scores ?? []);
+      }
+    } catch {
+      /* history is best-effort */
+    }
+  }
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
 
   const confidenceTone = result
     ? result.confidence >= 0.7
@@ -68,8 +124,8 @@ export default function AppPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <StatusBadge tone="info" dot className="px-3 py-1">
-              Demo mode
+            <StatusBadge tone="success" dot className="px-3 py-1">
+              Postgres en vivo
             </StatusBadge>
           </div>
         </div>
@@ -92,6 +148,7 @@ export default function AppPage() {
           <p className="text-sm text-muted-foreground mb-5">
             Puntúa una respuesta frente a su fuente de referencia. El juez de demo es un proxy
             léxico deliberadamente naive: mide solapamiento de palabras entre respuesta y fuente.
+            Cada puntuación queda guardada en Postgres.
           </p>
 
           <Card className="p-4 space-y-4">
@@ -121,20 +178,23 @@ export default function AppPage() {
             </div>
             <button
               onClick={run}
-              className="w-full rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-medium text-[#ffffff] hover:bg-accent/90 transition-colors"
+              disabled={loading}
+              className="w-full rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-medium text-[#ffffff] hover:bg-accent/90 transition-colors disabled:opacity-50"
             >
-              Puntuar respuesta
+              {loading ? "Puntuando…" : "Puntuar respuesta"}
             </button>
           </Card>
 
-          {result && (
+          {result?.error && <Alert tone="danger" title="No se pudo puntuar" className="mt-4">{result.error}</Alert>}
+
+          {result && !result.error && (
             <Card className="mt-4 p-5">
               <div className="mb-4 flex flex-wrap items-center gap-3">
                 <StatusBadge tone={confidenceTone} dot>
                   Confianza {pct(result.confidence)}
                 </StatusBadge>
                 <span className="text-sm text-muted-foreground">
-                  Puntuación total: <span className="font-semibold text-foreground">{judgeTotal(result)}/6</span>
+                  Puntuación total: <span className="font-semibold text-foreground">{result.total}/6</span>
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -146,6 +206,35 @@ export default function AppPage() {
           )}
         </section>
 
+        {/* ── HISTORY ─────────────────────────── */}
+        {history.length > 0 && (
+          <section>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Historial de puntuaciones (persistido en Postgres)</h3>
+            <div className="overflow-x-auto rounded-[var(--radius-md)] shadow-[var(--shadow-card)] bg-card">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--border)] bg-[var(--gray-50)]">
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Corrección</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Completitud</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Confianza</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--border)]">
+                  {history.map((h) => (
+                    <tr key={h.id}>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-foreground">{h.correccion}/3</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-foreground">{h.completitud}/3</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-foreground">{pct(Number(h.confidence))}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-foreground">{h.total}/6</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
         {/* ── RULE NOTE ───────────────────────── */}
         <section>
           <Alert tone="info" title="Cómo puntúa el juez">
@@ -156,7 +245,7 @@ export default function AppPage() {
         </section>
 
         <footer className="pt-8 border-t border-[var(--border)] flex items-center justify-between text-xs text-muted-foreground">
-          <span>Veredicto · Eval harness · Demo mode</span>
+          <span>Veredicto · Eval harness · Postgres en vivo</span>
           <a href="https://github.com/mdeasis27/veredicto" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors font-mono">GitHub</a>
         </footer>
       </div>
