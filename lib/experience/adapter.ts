@@ -1,0 +1,20 @@
+import corpus from "@/lib/eval/golden/corpus.json";
+import questions from "@/lib/eval/golden/questions.json";
+import { bm25Retriever, tfidfRetriever, reciprocalRankFusion } from "@/lib/eval/retrievers";
+import { precisionAtK, recallAtK } from "@/lib/eval/retrieval";
+import { getCalibration } from "@/lib/eval/demo";
+import { compareRuns } from "@/lib/eval/diff";
+import type { RunResult } from "@/lib/eval/types";
+import type { DemoAdapter, TraceEvent } from "./types";
+type CorpusChunk = { id: string; text: string };
+type Question = { id: string; query: string; relevantChunkIds: string[] };
+export type ExperienceInput = { queryId: string; retriever: "bm25" | "tfidf" | "hybrid" | "degraded"; k: number };
+export type ExperienceResult = { gate: "pass" | "block" | "unscored"; ranking: string[]; precision: number; recall: number; corpusSize: number; regression: ReturnType<typeof compareRuns>; calibration: ReturnType<typeof getCalibration> };
+export const runExperience: DemoAdapter<ExperienceInput, ExperienceResult> = async (input, signal, onEvent) => {
+  const startedAt = performance.now();
+  const docs = corpus as CorpusChunk[]; const query = (questions as Question[]).find((item) => item.id === input.queryId); if (!query) throw new Error("Choose a supported benchmark query."); if (!Number.isSafeInteger(input.k)) throw new Error("k must be a safe integer."); if (input.k < 1 || input.k > docs.length) throw new Error("k must be within the corpus size."); if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+  const bm25 = bm25Retriever(docs); const tfidf = tfidfRetriever(docs); const selected = input.retriever === "bm25" ? bm25 : input.retriever === "tfidf" ? tfidf : input.retriever === "hybrid" ? reciprocalRankFusion([bm25, tfidf], docs) : (() => []);
+  const run = (label: string, retrieve: typeof bm25): RunResult => { const rankingFor = retrieve(query.query, input.k); const recall = recallAtK(rankingFor, new Set(query.relevantChunkIds), input.k); return { runId: label, label, createdAt: "local", k: input.k, cases: [{ id: query.id, difficulty: "single", passed: recall >= .5, recall, reciprocalRank: 0, ndcg: 0 }], metrics: { passRate: recall >= .5 ? 1 : 0, recallAtK: recall, mrr: 0, ndcgAtK: 0 }, byDifficulty: {} }; };
+  const ranking = selected(query.query, input.k); const relevant = new Set(query.relevantChunkIds); const regression = compareRuns(run("bm25", bm25), run(input.retriever, selected)); const gate: ExperienceResult["gate"] = query.relevantChunkIds.length === 0 ? "unscored" : recallAtK(ranking, relevant, input.k) >= .5 && regression.severity === "ok" ? "pass" : "block"; const result = { gate, ranking, precision: precisionAtK(ranking, relevant, input.k), recall: recallAtK(ranking, relevant, input.k), corpusSize: docs.length, regression, calibration: getCalibration() };
+  const trace: TraceEvent[] = ranking.map((id, index) => ({ id, step: index + 1, kind: "ranking", messageKey: relevant.has(id) ? "relevant" : "retrieved", timestampMs: performance.now() - startedAt, evidenceIds: [id] })); trace.push({ id: "regression-gate", step: trace.length + 1, kind: "decision", messageKey: gate === "unscored" ? "gate-unscored" : gate === "pass" ? "gate-passed" : "gate-blocked", timestampMs: performance.now() - startedAt }); for (const event of trace) { if (signal.aborted) throw new DOMException("Aborted", "AbortError"); onEvent(event); if (signal.aborted) throw new DOMException("Aborted", "AbortError"); } return { input, result, trace, executionMs: performance.now() - startedAt, mode: "local" };
+};

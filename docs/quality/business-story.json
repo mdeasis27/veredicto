@@ -1,0 +1,40 @@
+{
+  "en": {
+    "user": "Internal support search owner",
+    "problem": "A support answer can cite a poorly ranked policy passage.",
+    "workflow": "Choose hybrid or degraded retrieval, rank local passages, inspect the top result and release gate.",
+    "decision": "Release or block a retrieval configuration for internal policy search.",
+    "value": "Lets a reviewer see the ranked evidence before changing the search path.",
+    "visual": "Ranked policy passages converge into a retrieval gate.",
+    "scenarioA": {
+      "title": "Hybrid retrieval",
+      "input": "Hybrid retriever, first benchmark question, top 3 results.",
+      "observation": "A ranked policy result remains available."
+    },
+    "scenarioB": {
+      "title": "Degraded retrieval",
+      "input": "Degraded retriever, same question and top 3 limit.",
+      "observation": "The retrieval gate blocks the path."
+    },
+    "limitation": "Local rankings are deterministic examples, not relevance measurements from live support traffic."
+  },
+  "es": {
+    "user": "Responsable de búsqueda de soporte interno",
+    "problem": "Una respuesta de soporte puede citar un pasaje de política mal ordenado.",
+    "workflow": "Elige recuperación híbrida o degradada, ordena pasajes locales e inspecciona el resultado principal y la compuerta.",
+    "decision": "Liberar o bloquear una configuración de recuperación para búsqueda interna de políticas.",
+    "value": "Permite revisar evidencia ordenada antes de cambiar la ruta de búsqueda.",
+    "visual": "Pasajes de política ordenados convergen en una compuerta de recuperación.",
+    "scenarioA": {
+      "title": "Recuperación híbrida",
+      "input": "Recuperador híbrido, primera pregunta de referencia, top 3 resultados.",
+      "observation": "Permanece disponible un resultado de política ordenado."
+    },
+    "scenarioB": {
+      "title": "Recuperación degradada",
+      "input": "Recuperador degradado, misma pregunta y límite de 3 resultados.",
+      "observation": "La compuerta de recuperación bloquea la ruta."
+    },
+    "limitation": "Los rankings locales son ejemplos deterministas, no mediciones de relevancia con tráfico real de soporte."
+  }
+}

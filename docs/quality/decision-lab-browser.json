@@ -1,0 +1,51 @@
+{
+  "repository": "veredicto",
+  "scope": "Real React component with controlled locale; Next routes not tested.",
+  "checks": [
+    {
+      "locale": "en",
+      "scenarios": [
+        {
+          "preset": "Hybrid retrieval\nHybrid retriever, first benchmark question, top 3 results.",
+          "outcome": "Release allowed\n\nhybrid changed 0 points against BM25."
+        },
+        {
+          "preset": "Degraded retrieval\nDegraded retriever, same question and top 3 limit.",
+          "outcome": "Release blocked\n\ndegraded changed -100 points against BM25."
+        }
+      ],
+      "mobileNoOverflow": true,
+      "reducedMotion": true,
+      "keyboard": true,
+      "noRequests": true,
+      "sceneChangesWithScenario": true,
+      "editingClearsPresetAndTrace": true,
+      "resetRestoresFirstPreset": true,
+      "cancelControlPresent": true,
+      "presetRestoresAllInputs": true
+    },
+    {
+      "locale": "es",
+      "scenarios": [
+        {
+          "preset": "Recuperación híbrida\nRecuperador híbrido, primera pregunta de referencia, top 3 resultados.",
+          "outcome": "Liberación permitida\n\nLa configuración hybrid cambió 0 puntos frente a BM25."
+        },
+        {
+          "preset": "Recuperación degradada\nRecuperador degradado, misma pregunta y límite de 3 resultados.",
+          "outcome": "Liberación bloqueada\n\nLa configuración degraded cambió -100 puntos frente a BM25."
+        }
+      ],
+      "mobileNoOverflow": true,
+      "reducedMotion": true,
+      "keyboard": true,
+      "noRequests": true,
+      "sceneChangesWithScenario": true,
+      "editingClearsPresetAndTrace": true,
+      "resetRestoresFirstPreset": true,
+      "cancelControlPresent": true,
+      "presetRestoresAllInputs": true
+    }
+  ],
+  "errors": []
+}

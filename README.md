@@ -1,114 +1,95 @@
-# Veredicto
+# Retrieval evaluation
 
-**Evaluation harness for retrieval-augmented document Q&A.** Golden-set retrieval
-metrics, LLM-as-judge calibration against human labels, bias audit, and a CI
-regression gate — measured over a fintech/credit corpus, reproducible with zero
-API keys.
+[Español](README.es.md) · [Try the demo](https://veredicto-manueldeasis27-2515s-projects.vercel.app/en/app) · [Case study](https://manueldeasis.com/en/projects/veredicto) · [Source](https://github.com/mdeasis27/veredicto)
 
-> **Result:** On a 24-query golden set over 16 fintech policy chunks, **Sparse (BM25)
-> wins** — `recall@5 87.5% · MRR@5 0.842 · nDCG@5 0.845`, ahead of the hybrid
-> (RRF) config. The deterministic demo judge reaches **κ = 0.61** against humans
-> (pooled), and the CI gate blocks a deliberately degraded retriever at
-> **−66.7 pp** pass-rate.
+![Actual interactive local interface](docs/images/cover.png)
 
----
+Compare retrieval configurations and query subsets to inspect rankings and quality gates.
 
-## Result
+## Two situations to compare
 
-### Retrieval benchmark (k = 5, n = 24)
+**Hybrid retrieval:** Hybrid retriever, first benchmark question, top 3 results. A ranked policy result remains available.
 
-| Config | Recall@5 | MRR@5 | nDCG@5 |
-|---|---|---|---|
-| **Sparse (BM25)** | **87.50%** | **0.8417** | **0.8448** |
-| Dense (TF-IDF proxy) | 83.33% | 0.8125 | 0.8130 |
-| Hybrid (RRF) | 83.33% | 0.8333 | 0.8286 |
+![Hybrid retrieval](docs/images/scenario-a.png)
 
-The interesting (and honest) finding: BM25 beats the hybrid on this small,
-fact-heavy corpus. Hybrid retrieval earns its keep on corpora where the lexical
-and semantic signals disagree — a point the demo makes rather than hides.
+**Degraded retrieval:** Degraded retriever, same question and top 3 limit. The retrieval gate blocks the path.
 
-### Judge calibration (quadratic weighted kappa)
+![Degraded retrieval](docs/images/scenario-b.png)
 
-| Criterion | Judge ↔ human | Human ↔ human (ceiling) |
-|---|---|---|
-| Corrección | κ = 0.56 | κ = 1.00 |
-| Completitud | κ = 0.64 | κ = 0.64 |
-| **Pooled** | **κ = 0.61** | — |
+## Business use case
 
-The judge is a **deliberately naive lexical proxy** in demo mode. The calibration
-tells a clean story: on *completitud* (lexical coverage) it already matches
-human-level agreement (0.64 vs 0.64); on *corrección* it falls far short of the
-human ceiling (0.56 vs 1.00) because lexical overlap **cannot detect a wrong
-number**. That gap is exactly what a real LLM judge + calibrated rubric is for.
-ECE = 0.167 · Brier = 0.102.
+A support answer can cite a poorly ranked policy passage.
 
-### Bias audit
+**Who uses it:** Internal support search owner.
 
-| Bias | Value |
-|---|---|
-| Position (simulated order-biased judge) | flip rate 14.3% |
-| Length | ρ(score, length) = 0.005 |
-| Self-preference (illustrative) | 0% |
+**The decision:** Release or block a retrieval configuration for internal policy search.
 
-### CI regression gate
+Choose hybrid or degraded retrieval, rank local passages, inspect the top result and release gate.
 
-Simulating a retriever that drops its top result regresses **16/24 queries**
-(pass rate 87.5% → 20.8%, **−66.7 pp**) and trips the critical threshold. The
-gate logic is in `lib/eval/diff.ts` (TS) and `backend/src/veredicto/diff.py`.
+### Try the decision
 
----
+**Hybrid retrieval:** Hybrid retriever, first benchmark question, top 3 results. A ranked policy result remains available.
+
+**Degraded retrieval:** Degraded retriever, same question and top 3 limit. The retrieval gate blocks the path.
+
+Choose a scenario, edit its controls and run the local computation. Step through the visual process or reveal all steps. Reset before comparing the second scenario.
+
+## How to try it
+
+Open `/en/app` (English, default) or `/es/app` (Spanish). Change the scenario inputs and run the computation. Inspect the resulting decision, evidence and computed trace. Playback reveals completed local steps; it does not measure a live model. Reset starts a new local scenario. Changing language resets the scenario.
+
+The primary demo needs no account, API key or database. Public links refer to the existing deployment; local redesign changes are pending publication.
+
+<!-- recruiter-mission:start -->
+### Your interactive mission
+
+Load empty retrieval, inspect the same benchmark query and top-3 limit, optionally predict the local gate and reveal the terminal ranking comparison.
+
+Selected retrieval and the BM25 reference use identical question, committed corpus and k. Precision counts relevant retrieved slots divided by k; recall divides relevant retrieved passages by the labeled relevant set. Degraded retrieval is an explicitly empty-ranking negative control. Equal outcomes remain equal. The local gate also requires recall of at least 0.5; no relevant labels means unscored, never approved.
+
+**Why this approach:** Local BM25, TF-IDF and rank fusion make the calculation inspectable without credentials. A one-question gate is not a release certification; existing calibration is reference data rather than evidence of this execution.
+
+**Before production:** Evaluate a representative labeled query set, segment regressions, citation quality, privacy and production latency before releasing retrieval changes.
+
+Editing inputs, choosing a preset or resetting clears the prediction and obsolete results. Comparisons appear only at completed playback; the primary demos need no account or key.
+
+This batch changes the implementation. Existing screenshots and browser reports document the previous stage. Fresh captures, browser interaction, mobile and HTTP verification remain pending under the documented tool denials. Prior owner visual approval covers the earlier six-mission pilot, not this batch.
+<!-- recruiter-mission:end -->
+
+## Local setup and verification
+
+Requires Node.js 22 and pnpm 10.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+node node_modules/typescript/bin/tsc --noEmit --incremental false
+pnpm lint
+pnpm build
+```
+
+Open `http://localhost:3000/en/app`. Recorded validation covers tests, lint, TypeScript and production builds. See [command results](docs/quality/decision-lab-verification.json) and [browser component checks](docs/quality/decision-lab-browser.json). The new browser checks exercise real React components and production CSS with controlled locale navigation; they do not certify Next routes or public deployment.
 
 ## Architecture
 
-```
-lib/eval/            # canonical metrics + harness (TypeScript, tested)
-  retrieval.ts       #   precision@k, recall@k, MRR, nDCG@k, average precision
-  agreement.ts       #   Cohen κ, weighted κ, Spearman, MAE, ECE, Brier
-  bias.ts            #   position / length / self-preference
-  diff.ts            #   run-vs-run regression detection + thresholds
-  retrievers.ts      #   BM25, TF-IDF, reciprocal-rank fusion (deterministic)
-  demo-judge.ts      #   deterministic lexical judge (demo mode only)
-  demo.ts            #   wires golden set → benchmark, calibration, bias, gate
-  golden/            #   corpus, questions, human labels (committed)
-backend/             # same math in Python + pytest (authoritative)
-  src/veredicto/
-  tests/             #   pinned to a scikit-learn reference fixture
-app/                 # Next.js demo dashboard + landing (Vercel, demo mode)
-```
+- `app/[lang]/`: localized browser experience.
+- `lib/experience/`: typed local adapter, validation and run traces.
+- `design-system/`: shared visual tokens, locale controls and execution/replay presentation.
+- `app/api/`: optional server integrations; the primary demo does not require them.
 
-## Design decisions & tradeoffs
+Technology: Next.js 16, TypeScript, Python, Vitest, pytest, scikit-learn (reference), Tailwind CSS v4.
 
-1. **The math lives in two languages.** Vercel can't run Python, so the public
-   demo needs the metrics in TypeScript; the authoritative harness is Python.
-   Both are pinned to the same `fixtures/agreement.json` generated by
-   **scikit-learn**, so a divergence fails tests in either language.
-2. **Demo mode uses a lexical judge and a TF-IDF "dense" proxy.** No model
-   downloads, no keys — the dashboard computes *real* numbers offline. This is a
-   documented simplification, not a hidden one.
-3. **Small golden set (n = 24), stratified** across single-hop / multi-hop /
-   aggregation / out-of-scope. The point is the harness, not the corpus size.
+## Evidence and limitations
 
-## What did not work
+Ranked policy passages converge into a retrieval gate.
 
-- **Hybrid did not beat BM25** on this corpus. Expected: with 16 short chunks and
-  highly overlapping vocabulary, lexical match dominates and the fusion adds
-  nothing. The honest fix is a larger corpus with real synonym/paraphrase
-  queries, or a neural embedder (which the demo intentionally avoids).
-- **The lexical judge cannot catch numeric errors.** `j13` ("5 por ciento") is
-  lexically close to the source ("12 por ciento") so the proxy judge overrates
-  it while humans mark it wrong — precisely why its κ is only 0.56 on corrección.
+Per-query rankings and calibration over a disclosed local corpus.
 
-## Run it
+Lets a reviewer see the ranked evidence before changing the search path.
 
-```bash
-# frontend demo + TS tests
-pnpm install && pnpm dev      # http://localhost:3000
-pnpm test                     # 30 vitest tests
+**Limits:** Local rankings are deterministic examples, not relevance measurements from live support traffic. These portfolio prototypes do not claim measured production impact.
 
-# backend (authoritative metrics) — Python 3.12+
-cd backend && uv sync --extra dev && uv run pytest   # 15 tests, pinned to sklearn
-```
+Inputs use fictional or anonymized examples. Optional live integrations require their own credentials and operational setup. Secrets belong in the configured secret manager, never in local secret files or Git. Use the existing `infisical run -- <command>` workflow when live integration is needed. This repository does not publish or deploy automatically as part of the local demo.
 
-## Stack
-
-Next.js 16 · TypeScript · Vitest · Tailwind v4 · Python 3.14 · pytest · scikit-learn (reference only)
+![Actual English demo capture](docs/images/demo.png)
