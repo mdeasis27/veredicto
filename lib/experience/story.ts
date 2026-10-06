@@ -19,7 +19,7 @@ export interface VeredictoStory {
 export const STORY: Record<"en" | "es", VeredictoStory> = {
   en: {
     name: "Retrieval evaluation",
-    oneLiner: "If the exam doesn't change, you know whether the search got better or worse, and not only whether it did well today.",
+    oneLiner: "If the exam stays the same, every new score tells you whether the search got better or worse.",
     chips: ["Search evaluation", "2 min", "Live demo"],
     analogy: {
       heading: { before: "The", accent: "analogy" },
@@ -101,7 +101,7 @@ export const STORY: Record<"en" | "es", VeredictoStory> = {
   },
   es: {
     name: "Veredicto",
-    oneLiner: "Si el examen no cambia, sabes si el buscador mejoró o empeoró, y no solo si hoy le fue bien.",
+    oneLiner: "Si el examen es siempre el mismo, cada calificación nueva te dice si el buscador mejoró o empeoró.",
     chips: ["Evaluación de búsqueda", "2 min", "Demo en vivo"],
     analogy: {
       heading: { accent: "La analogía" },
