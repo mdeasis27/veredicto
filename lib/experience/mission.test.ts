@@ -33,3 +33,14 @@ it("runs the mission against reading 8 passages, reveals in groups and stops whe
   const c = new AbortController(); c.abort();
   await expect(runMission({ k: 3 }, c.signal, () => {})).rejects.toThrow();
 });
+
+it("says which of the passages read held labelled evidence for each question", () => {
+  const at = (k: number, id: string) => checkQuestions(k).find(i => i.id === id)?.evidenceAt;
+  expect(at(3, "q14")).toEqual([]);
+  expect(at(8, "q14")).toEqual([6]);
+  expect(at(3, "q13")).toEqual([1, 3]);
+  expect(at(3, "q20")).toEqual([]);
+  expect(at(1, "q19")).toEqual([1]);
+  expect(checkQuestions(1).find(i => i.id === "q19")?.status).toBe("lost");
+  for (const k of [1, 3, 8]) for (const q of checkQuestions(k)) expect(q.evidenceAt.every(p => p >= 1 && p <= k)).toBe(true);
+});

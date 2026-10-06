@@ -1,7 +1,5 @@
 import type { Heading } from "@/design-system/demo/project-story";
 
-type NodeCopy = { name: string; sub: string; analogy: string };
-
 export interface VeredictoStory {
   name: string;
   oneLiner: string;
@@ -13,7 +11,11 @@ export interface VeredictoStory {
   fit: { heading: Heading; worthLabel: string; worth: string; notLabel: string; not: string };
   proves: { heading: Heading; text: string };
   engineers: { summary: string; points: string[]; repoLabel: string };
-  scene: { title: string; caption: string; statusLabels: { active: string; danger: string; success: string }; tapeLabel: string; nodes: { questions: NodeCopy; searcher: NodeCopy; found: NodeCopy; outside: NodeCopy }; tape: { served: string; rerouted: string; lost: string }; missedOf: (n: number) => string };
+  scene: {
+    title: string; caption: string; reads: (k: number) => string; question: (n: number) => string; waiting: string; passage: string;
+    notes: { served: (...pages: number[]) => string; partial: string; lost: string; rerouted: string };
+    exam: string; sameExam: string; offSyllabus: string; sheetLabel: (found: number, answerable: number, offSyllabus: number, ...missed: number[]) => string; missedOf: (n: number, of: number) => string;
+  };
 }
 
 export const STORY: Record<"en" | "es", VeredictoStory> = {
@@ -43,7 +45,7 @@ export const STORY: Record<"en" | "es", VeredictoStory> = {
       yes: "Yes, all 21",
       no: "No, some are missed",
       kLabel: "Passages read per question",
-      note: "Each square is one exam question, in order. Read more passages and the search finds more, but it also hands more text to whoever reads the answer.",
+      note: "Each line on the exam sheet is one question, in order. Read more passages and the search finds more, but it also hands more text to whoever reads the answer.",
       simulate: "Run it",
       cancel: "Cancel",
       reset: "Start over",
@@ -85,18 +87,23 @@ export const STORY: Record<"en" | "es", VeredictoStory> = {
       repoLabel: "Source code",
     },
     scene: {
-      title: "What the search found for each question",
-      caption: "Watch the exam get graded question by question.",
-      statusLabels: { active: "searching", success: "found it", danger: "missed some" },
-      tapeLabel: "Twenty-four exam questions, in order",
-      nodes: {
-        questions: { name: "Exam", sub: "24 questions", analogy: "the exam" },
-        searcher: { name: "Search", sub: "reads passages", analogy: "the student" },
-        found: { name: "Evidence", sub: "the right passage", analogy: "the right page" },
-        outside: { name: "No answer", sub: "not in the documents", analogy: "off the syllabus" },
+      title: "The teacher grades the exam",
+      caption: "Each question gets a tick when one of the passages read holds its evidence, a cross when it is missed, and a blue note when its answer is not in the documents.",
+      reads: (k) => `The student reads ${k} ${k === 1 ? "passage" : "passages"}`,
+      question: (n) => `Question ${n}`,
+      waiting: "Grading starts",
+      passage: "passage",
+      notes: {
+        served: (...pages) => pages.length === 1 ? `Passage ${pages[0]} holds the evidence` : `Passages ${pages.slice(0, -1).join(", ")} and ${pages[pages.length - 1]} hold the evidence`,
+        partial: "Only part of its evidence was in these passages",
+        lost: "None of these passages holds its evidence",
+        rerouted: "Not in the documents, so it is not graded",
       },
-      tape: { served: "found its evidence", rerouted: "off the syllabus", lost: "missed" },
-      missedOf: (n) => `Answerable questions missed: ${n} of 21`,
+      exam: "Exam",
+      sameExam: "same exam every time",
+      offSyllabus: "off the syllabus",
+      sheetLabel: (found, answerable, off, ...missed) => `Exam sheet: ${found} of ${answerable} answerable questions found their evidence, ${off} off the syllabus${missed.length ? `, missed: question ${missed.join(", ")}` : ", none missed"}.`,
+      missedOf: (n, of) => `Answerable questions missed: ${n} of ${of}`,
     },
   },
   es: {
@@ -125,7 +132,7 @@ export const STORY: Record<"en" | "es", VeredictoStory> = {
       yes: "Sí, las 21",
       no: "No, se pierde alguna",
       kLabel: "Pasajes leídos por pregunta",
-      note: "Cada cuadrito es una pregunta del examen, en orden. Si lee más pasajes, el buscador encuentra más, pero también le pasa más texto a quien lee la respuesta.",
+      note: "Cada renglón de la hoja es una pregunta del examen, en orden. Si lee más pasajes, el buscador encuentra más, pero también le pasa más texto a quien lee la respuesta.",
       simulate: "Correr",
       cancel: "Cancelar",
       reset: "Empezar de nuevo",
@@ -167,18 +174,23 @@ export const STORY: Record<"en" | "es", VeredictoStory> = {
       repoLabel: "Código fuente",
     },
     scene: {
-      title: "Lo que encontró el buscador en cada pregunta",
-      caption: "Mira cómo se califica el examen pregunta por pregunta.",
-      statusLabels: { active: "buscando", success: "la encontró", danger: "perdió algunas" },
-      tapeLabel: "Veinticuatro preguntas del examen, en orden",
-      nodes: {
-        questions: { name: "Examen", sub: "24 preguntas", analogy: "el examen" },
-        searcher: { name: "Buscador", sub: "lee pasajes", analogy: "el alumno" },
-        found: { name: "Evidencia", sub: "el pasaje correcto", analogy: "la página correcta" },
-        outside: { name: "Sin respuesta", sub: "no está en los documentos", analogy: "fuera del temario" },
+      title: "La maestra califica el examen",
+      caption: "Cada pregunta recibe una palomita si alguno de los pasajes leídos tiene su evidencia, una × si se pierde y una nota azul si su respuesta no está en los documentos.",
+      reads: (k) => `El alumno lee ${k} ${k === 1 ? "pasaje" : "pasajes"}`,
+      question: (n) => `Pregunta ${n}`,
+      waiting: "Empieza la calificación",
+      passage: "pasaje",
+      notes: {
+        served: (...pages) => pages.length === 1 ? `El pasaje ${pages[0]} tiene la evidencia` : `Los pasajes ${pages.slice(0, -1).join(", ")} y ${pages[pages.length - 1]} tienen la evidencia`,
+        partial: "Solo parte de su evidencia estaba en estos pasajes",
+        lost: "Ninguno de estos pasajes tiene su evidencia",
+        rerouted: "No está en los documentos, así que no se califica",
       },
-      tape: { served: "encontró su evidencia", rerouted: "fuera del temario", lost: "perdida" },
-      missedOf: (n) => `Preguntas con respuesta perdidas: ${n} de 21`,
+      exam: "Examen",
+      sameExam: "mismo examen cada vez",
+      offSyllabus: "fuera del temario",
+      sheetLabel: (found, answerable, off, ...missed) => `Hoja del examen: ${found} de ${answerable} preguntas con respuesta encontraron su evidencia, ${off} fuera del temario${missed.length ? `, perdidas: pregunta ${missed.join(", ")}` : ", ninguna perdida"}.`,
+      missedOf: (n, of) => `Preguntas con respuesta perdidas: ${n} de ${of}`,
     },
   },
 };

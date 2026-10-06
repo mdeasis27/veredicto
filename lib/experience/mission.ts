@@ -6,7 +6,8 @@ import type { DemoAdapter, TraceEvent } from "./types";
 
 type Question = { id: string; query: string; relevantChunkIds: string[] };
 export type QuestionStatus = "served" | "rerouted" | "lost";
-export type CheckedQuestion = { id: string; status: QuestionStatus };
+/** evidenceAt: 1-based positions, among the k passages read, that hold labelled evidence. */
+export type CheckedQuestion = { id: string; status: QuestionStatus; evidenceAt: number[] };
 export type MissionInput = { k: number };
 export type MissionResult = { items: CheckedQuestion[]; missed: number; comparison: { mine: number; wide: number } };
 
@@ -19,8 +20,11 @@ const hybrid = reciprocalRankFusion([bm25Retriever(docs), tfidfRetriever(docs)],
 export function checkQuestions(k: number): CheckedQuestion[] {
   if (!Number.isSafeInteger(k) || k < 1 || k > docs.length) throw new Error("k must be within the corpus size.");
   return (questions as Question[]).map(q => {
-    if (q.relevantChunkIds.length === 0) return { id: q.id, status: "rerouted" };
-    return { id: q.id, status: recallAtK(hybrid(q.query, k), new Set(q.relevantChunkIds), k) >= .5 ? "served" : "lost" };
+    if (q.relevantChunkIds.length === 0) return { id: q.id, status: "rerouted", evidenceAt: [] };
+    const read = hybrid(q.query, k).slice(0, k);
+    const relevant = new Set(q.relevantChunkIds);
+    const evidenceAt = read.flatMap((id, i) => relevant.has(id) ? [i + 1] : []);
+    return { id: q.id, status: recallAtK(read, relevant, k) >= .5 ? "served" : "lost", evidenceAt };
   });
 }
 

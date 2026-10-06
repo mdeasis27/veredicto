@@ -34,4 +34,18 @@ describe("Veredicto story copy", () => {
     expect(STORY.es.tryIt.question(1)).toContain("leyendo 1 pasaje por pregunta");
     expect([0, 1, 2].map(STORY.es.compare.verdict)).toEqual(["No se perdió ninguna pregunta con respuesta", "Se perdió 1 pregunta con respuesta", "Se perdieron 2 preguntas con respuesta"]);
   });
+
+  it("words the grading scene correctly in both languages and passes the copy lint", () => {
+    expect(STORY.en.scene.notes.served(1, 3)).toBe("Passages 1 and 3 hold the evidence");
+    expect(STORY.es.scene.notes.served(1, 2, 4)).toBe("Los pasajes 1, 2 y 4 tienen la evidencia");
+    expect(STORY.es.scene.notes.served(6)).toBe("El pasaje 6 tiene la evidencia");
+    expect(STORY.en.scene.reads(1)).toBe("The student reads 1 passage");
+    expect(STORY.es.scene.missedOf(1, 21)).toBe("Preguntas con respuesta perdidas: 1 de 21");
+    expect(STORY.en.scene.sheetLabel(20, 21, 3, 14)).toContain("missed: question 14");
+    for (const locale of ["en", "es"] as const) {
+      const sc = STORY[locale].scene;
+      const generated = [sc.reads(3), sc.question(14), sc.notes.served(1), sc.notes.served(1, 2), sc.sheetLabel(21, 21, 3), sc.sheetLabel(20, 21, 3, 14), sc.missedOf(0, 21)];
+      expect(lintStory(generated), locale).toEqual([]);
+    }
+  });
 });

@@ -28,7 +28,7 @@ export default function Page() {
   const clear = () => { setPrediction(null); demo.reset(); };
   const reset = () => { setK(DEFAULT_K); clear(); };
   const input = { k };
-  const scene = (frame: typeof COMPLETE_FRAME) => result ? <VeredictoStoryScene frame={frame} result={result} locale={locale} /> : null;
+  const scene = (frame: typeof COMPLETE_FRAME) => run && result ? <VeredictoStoryScene frame={frame} result={result} k={run.input.k} locale={locale} /> : null;
 
   return <main className="mx-auto max-w-5xl px-5 py-8 text-foreground sm:py-12">
     <StoryHero name={t.name} oneLiner={t.oneLiner} chips={t.chips} />
