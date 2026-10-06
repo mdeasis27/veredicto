@@ -42,9 +42,11 @@ describe("Veredicto story copy", () => {
     expect(STORY.en.scene.reads(1)).toBe("The student reads 1 passage");
     expect(STORY.es.scene.missedOf(1, 21)).toBe("Preguntas con respuesta perdidas: 1 de 21");
     expect(STORY.en.scene.sheetLabel(20, 21, 3, 14)).toContain("missed: question 14");
+    expect(STORY.en.scene.sheetLabel(19, 21, 3, 9, 14)).toContain("missed: questions 9, 14");
+    expect(STORY.es.scene.sheetLabel(19, 21, 3, 9, 14)).toContain("perdidas: preguntas 9, 14");
     for (const locale of ["en", "es"] as const) {
       const sc = STORY[locale].scene;
-      const generated = [sc.reads(3), sc.question(14), sc.notes.served(1), sc.notes.served(1, 2), sc.sheetLabel(21, 21, 3), sc.sheetLabel(20, 21, 3, 14), sc.missedOf(0, 21)];
+      const generated = [sc.reads(3), sc.question(14), sc.notes.served(1), sc.notes.served(1, 2), sc.sheetLabel(21, 21, 3), sc.sheetLabel(20, 21, 3, 14), sc.sheetLabel(19, 21, 3, 9, 14), sc.missedOf(0, 21)];
       expect(lintStory(generated), locale).toEqual([]);
     }
   });
